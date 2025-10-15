@@ -1360,13 +1360,13 @@
 
         async function getVisitorInfo() {
             try {
-                const response = await fetch('https://ipapi.co/json/');
+                const response = await fetch('https://api.ipgeolocation.io/ipgeo?apiKey=b647e2a9739c445984120017ef0a3884');
                 const data = await response.json();
                 return {
                     ip: data.ip,
                     city: data.city,
                     country: data.country_name,
-                    isp: data.org,
+                    isp: data.isp,
                     timestamp: new Date().toISOString()
                 };
             } catch (error) {
@@ -1518,16 +1518,18 @@
                             address: 'Adres alınıyor...'
                         };
                         
-                        // Get address from coordinates
+                        // Get address from coordinates using Nominatim (OpenStreetMap)
                         try {
-                            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${locationData.latitude}+${locationData.longitude}&key=demo&language=tr&pretty=1`);
+                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&accept-language=tr&addressdetails=1`);
                             const data = await response.json();
-                            if (data.results && data.results[0]) {
-                                locationData.address = data.results[0].formatted;
+                            if (data && data.display_name) {
+                                locationData.address = data.display_name;
+                            } else {
+                                locationData.address = `${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`;
                             }
                         } catch (addressError) {
                             console.log('Address lookup failed:', addressError);
-                            locationData.address = `Lat: ${locationData.latitude.toFixed(6)}, Lng: ${locationData.longitude.toFixed(6)}`;
+                            locationData.address = `${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`;
                         }
                         
                         const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
@@ -1623,15 +1625,29 @@
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
-                // Try to open in native maps app
-                window.open(`geo:${lat},${lng}`, '_blank');
-                // Fallback to Google Maps
-                setTimeout(() => {
-                    window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-                }, 1000);
+                // For mobile devices, try multiple options
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const isAndroid = /Android/.test(navigator.userAgent);
+                
+                if (isIOS) {
+                    // iOS - try Apple Maps first, then Google Maps
+                    window.open(`maps://maps.apple.com/?q=${lat},${lng}`, '_blank');
+                    setTimeout(() => {
+                        window.open(`https://maps.apple.com/?q=${lat},${lng}`, '_blank');
+                    }, 1000);
+                } else if (isAndroid) {
+                    // Android - try geo protocol first
+                    window.open(`geo:${lat},${lng}?q=${lat},${lng}`, '_blank');
+                    setTimeout(() => {
+                        window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
+                    }, 1000);
+                } else {
+                    // Other mobile browsers
+                    window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
+                }
             } else {
-                // Desktop - open Google Maps
-                window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                // Desktop - use OpenStreetMap as primary option
+                window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
             }
         }
 
@@ -1752,5 +1768,5 @@
             }, 5000);
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f00ceb0432e00b',t:'MTc2MDUzOTAwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f01ad74398e00b',t:'MTc2MDUzOTU3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
