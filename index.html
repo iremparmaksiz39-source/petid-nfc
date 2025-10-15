@@ -10,7 +10,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
@@ -41,6 +41,7 @@
         
         // Firebase Auth functions
         window.firebaseSignIn = signInWithEmailAndPassword;
+        window.firebaseCreateUser = createUserWithEmailAndPassword;
         window.firebaseSignOut = signOut;
         window.firebaseAuthStateChanged = onAuthStateChanged;
         window.firebaseSetPersistence = setPersistence;
@@ -61,72 +62,6 @@
 
         // Initialize auth state listener when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                if (window.initializeFirebaseAuth) {
-                    window.initializeFirebaseAuth();
-                }
-            }, 100);
-        });
-    </script>
-    
-    <!-- Firebase SDK v14 -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/14.0.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/14.0.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/14.0.0/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/14.0.0/firebase-analytics.js";
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCZSnh9jWibR4a0Pc6RKBDYlGZNXP_Tiu8",
-            authDomain: "petnfc-46178.firebaseapp.com",
-            projectId: "petnfc-46178",
-            storageBucket: "petnfc-46178.firebasestorage.app",
-            messagingSenderId: "942096749783",
-            appId: "1:942096749783:web:afcd7f8e4f4f109f3c4c92",
-            measurementId: "G-XS8LXGR545"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const analytics = getAnalytics(app);
-
-        // Set persistence to keep user logged in
-        setPersistence(auth, browserLocalPersistence).catch((error) => {
-            console.log("Persistence setting failed:", error);
-        });
-
-        // Make Firebase available globally
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        window.firebaseApp = app;
-        
-        // Firebase Auth functions
-        window.firebaseSignIn = signInWithEmailAndPassword;
-        window.firebaseSignOut = signOut;
-        window.firebaseAuthStateChanged = onAuthStateChanged;
-        window.firebaseSetPersistence = setPersistence;
-        window.firebaseBrowserLocalPersistence = browserLocalPersistence;
-        
-        // Firestore functions
-        window.firestoreDoc = doc;
-        window.firestoreSetDoc = setDoc;
-        window.firestoreGetDoc = getDoc;
-        window.firestoreCollection = collection;
-        window.firestoreAddDoc = addDoc;
-        window.firestoreUpdateDoc = updateDoc;
-        window.firestoreDeleteDoc = deleteDoc;
-        window.firestoreGetDocs = getDocs;
-        window.firestoreQuery = query;
-        window.firestoreWhere = where;
-        window.firestoreOrderBy = orderBy;
-
-        // Initialize auth state listener when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Wait a bit for all scripts to load
             setTimeout(() => {
                 if (window.initializeFirebaseAuth) {
                     window.initializeFirebaseAuth();
@@ -150,12 +85,6 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-        .stats-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-        .location-card {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
         .call-button {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
         }
@@ -170,19 +99,6 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
-        .location-alert {
-            animation: locationPulse 3s infinite;
-        }
-        @keyframes locationPulse {
-            0%, 100% { 
-                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-                transform: scale(1);
-            }
-            50% { 
-                background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-                transform: scale(1.02);
-            }
-        }
         .modal {
             backdrop-filter: blur(10px);
         }
@@ -192,11 +108,6 @@
         .form-input:focus {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .qr-code {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            padding: 20px;
-            border-radius: 15px;
         }
         .feature-card {
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
@@ -211,21 +122,6 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        .image-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        .gallery-item {
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
         .tab-button {
             transition: all 0.3s ease;
         }
@@ -233,17 +129,60 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        .admin-card {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        .photo-upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s ease;
         }
-        .admin-stats {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        .photo-upload-area:hover {
+            border-color: #9333ea;
+            background-color: #faf5ff;
         }
-        .danger-zone {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+        .photo-preview {
+            position: relative;
+            overflow: hidden;
         }
-        .visitor-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .photo-preview img {
+            transition: transform 0.3s ease;
+        }
+        .photo-preview:hover img {
+            transform: scale(1.05);
+        }
+        .delete-photo {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .photo-preview:hover .delete-photo {
+            opacity: 1;
+        }
+        .social-input {
+            padding-left: 40px;
+        }
+        .social-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -258,8 +197,8 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <button id="loginBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">Giriş Yap</button>
-                    <button id="logoutBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium hidden">Çıkış Yap</button>
+                    <button id="loginBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium cursor-pointer">Giriş Yap</button>
+                    <button id="logoutBtn" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium hidden cursor-pointer">Çıkış Yap</button>
                 </div>
             </div>
         </div>
@@ -363,7 +302,7 @@
                     </div>
                     <div class="bg-white rounded-xl shadow-lg p-8">
                         <h4 class="text-xl font-semibold mb-4">NFC Tag Satışı</h4>
-                        <div class="text-3xl font-bold mb-4" id="nfcPriceDisplay"></div>
+                        <div class="text-3xl font-bold mb-4">₺25</div>
                         <ul class="text-left space-y-2 mb-6">
                             <li>🏷️ Hazır programlanmış NFC tag</li>
                             <li>📦 Ücretsiz kargo</li>
@@ -389,11 +328,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Admin Access (Hidden Link) -->
-            <div class="text-center">
-                <a href="?admin=true" class="text-xs text-gray-400 hover:text-gray-600">•</a>
-            </div>
         </div>
     </div>
 
@@ -405,8 +339,8 @@
                 <button id="addPetBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium">
                     + Yeni Hayvan Ekle
                 </button>
-                <button onclick="exportUserData()" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium">
-                    📥 Verileri İndir
+                <button id="editProfileBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                    👤 Profili Düzenle
                 </button>
             </div>
         </div>
@@ -426,25 +360,64 @@
     <!-- Login Modal -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <h3 class="text-2xl font-bold mb-6 text-center">Giriş Yap</h3>
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">E-posta</label>
-                    <input type="email" id="loginEmail" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">Şifre</label>
-                    <input type="password" id="loginPassword" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
-                </div>
-                <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">
+            <div class="flex mb-6 bg-gray-100 rounded-lg p-1">
+                <button type="button" id="loginTabBtn" class="flex-1 py-2 px-4 rounded-md text-sm font-medium bg-purple-600 text-white" onclick="switchLoginTab('login')">
                     Giriş Yap
                 </button>
-            </form>
+                <button type="button" id="registerTabBtn" class="flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600" onclick="switchLoginTab('register')">
+                    Kayıt Ol
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <div id="loginFormDiv">
+                <h3 class="text-2xl font-bold mb-6 text-center">Giriş Yap</h3>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">E-posta</label>
+                        <input type="email" id="loginEmail" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Şifre</label>
+                        <input type="password" id="loginPassword" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Giriş Yap
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerFormDiv" class="hidden">
+                <h3 class="text-2xl font-bold mb-6 text-center">Kayıt Ol</h3>
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Ad Soyad *</label>
+                        <input type="text" id="registerName" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">E-posta *</label>
+                        <input type="email" id="registerEmail" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Telefon Numarası *</label>
+                        <input type="tel" id="registerPhone" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="05XX XXX XX XX" required pattern="[0-9]{11}" maxlength="11">
+                        <p class="text-xs text-gray-500 mt-1">11 haneli telefon numarası (05XXXXXXXXX)</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Şifre *</label>
+                        <input type="password" id="registerPassword" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required minlength="6">
+                        <p class="text-xs text-gray-500 mt-1">En az 6 karakter</p>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Kayıt Ol
+                    </button>
+                </form>
+            </div>
+            
             <button id="closeLoginModal" class="mt-4 w-full text-gray-500 hover:text-gray-700">İptal</button>
         </div>
     </div>
-
-
 
     <!-- Add Pet Modal -->
     <div id="addPetModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
@@ -453,17 +426,17 @@
             
             <!-- Tab Navigation -->
             <div class="flex mb-8 bg-gray-100 rounded-lg p-1">
-                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium active" onclick="switchTab('basic')">
+                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium active bg-purple-600 text-white" onclick="switchTab('basic')">
                     📝 Temel Bilgiler
                 </button>
-                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium" onclick="switchTab('media')">
-                    📸 Medya & Sosyal
+                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600" onclick="switchTab('photos')">
+                    📸 Fotoğraflar
                 </button>
-                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium" onclick="switchTab('health')">
+                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600" onclick="switchTab('health')">
                     🏥 Sağlık & Veteriner
                 </button>
-                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium" onclick="switchTab('extra')">
-                    ➕ Ek Bilgiler
+                <button type="button" class="tab-button flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600" onclick="switchTab('social')">
+                    🌐 Sosyal Medya
                 </button>
             </div>
 
@@ -508,81 +481,28 @@
                             <label class="block text-gray-700 text-sm font-bold mb-2">Renk/Desen</label>
                             <input type="text" name="color" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Örn: Altın sarısı, beyaz göğüslü">
                         </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Ağırlık (kg)</label>
-                            <input type="number" name="weight" step="0.1" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Örn: 25.5">
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Mikroçip Numarası</label>
-                            <input type="text" name="microchip" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="15 haneli mikroçip numarası">
-                        </div>
                     </div>
                     
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Genel Açıklama</label>
                         <textarea name="description" rows="4" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Hayvanınızın karakteri, alışkanlıkları, sevdiği şeyler..."></textarea>
                     </div>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Kısırlaştırma Durumu</label>
-                            <select name="neutered" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500">
-                                <option value="">Seçiniz</option>
-                                <option value="evet">✅ Kısırlaştırıldı</option>
-                                <option value="hayır">❌ Kısırlaştırılmadı</option>
-                            </select>
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Çocuklarla İlişkisi</label>
-                            <select name="childFriendly" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500">
-                                <option value="">Seçiniz</option>
-                                <option value="çok-iyi">😍 Çok iyi</option>
-                                <option value="iyi">😊 İyi</option>
-                                <option value="orta">😐 Orta</option>
-                                <option value="dikkatli">⚠️ Dikkatli olunmalı</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Media & Social Tab -->
-                <div id="mediaTab" class="tab-content hidden">
+                <!-- Photos Tab -->
+                <div id="photosTab" class="tab-content hidden">
                     <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Profil Fotoğrafı</label>
-                        <input type="url" name="photo" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 mb-2" placeholder="Ana profil fotoğrafı URL'si">
-                        <p class="text-sm text-gray-500">Ana profil fotoğrafı olarak kullanılacak</p>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Ek Fotoğraflar</label>
-                        <div id="photoGallery" class="mb-4">
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="photoList">
-                                <!-- Photos will be added here -->
-                            </div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Fotoğraf Yükle</label>
+                        <div class="photo-upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                            <div class="text-4xl mb-4">📸</div>
+                            <p class="text-gray-600 mb-2">Fotoğraf yüklemek için tıklayın</p>
+                            <p class="text-sm text-gray-500">JPG, PNG, GIF (Max 5MB)</p>
                         </div>
-                        <div class="flex gap-2">
-                            <input type="url" id="newPhotoUrl" class="form-input flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Fotoğraf URL'si ekle">
-                            <button type="button" onclick="addPhoto()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg">Ekle</button>
-                        </div>
+                        <input type="file" id="photoInput" accept="image/*" multiple class="hidden" onchange="handlePhotoUpload(event)">
                     </div>
                     
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Instagram Profili</label>
-                            <input type="url" name="instagram" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://instagram.com/username">
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Facebook Profili</label>
-                            <input type="url" name="facebook" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://facebook.com/username">
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">TikTok Profili</label>
-                            <input type="url" name="tiktok" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://tiktok.com/@username">
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">YouTube Kanalı</label>
-                            <input type="url" name="youtube" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://youtube.com/channel/...">
-                        </div>
+                    <div id="photoPreview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Photo previews will be added here -->
                     </div>
                 </div>
 
@@ -591,17 +511,6 @@
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Sağlık Durumu</label>
                         <textarea name="health" rows="4" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Kronik hastalıklar, alerjiler, sürekli kullandığı ilaçlar..."></textarea>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Son Aşı Tarihi</label>
-                            <input type="date" name="lastVaccination" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500">
-                        </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Sonraki Aşı Tarihi</label>
-                            <input type="date" name="nextVaccination" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500">
-                        </div>
                     </div>
 
                     <div class="mb-6">
@@ -619,40 +528,56 @@
                     </div>
                 </div>
 
-                <!-- Extra Info Tab -->
-                <div id="extraTab" class="tab-content hidden">
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Beslenme Bilgileri</label>
-                        <textarea name="feeding" rows="3" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Mama markası, beslenme saatleri, özel diyet..."></textarea>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Davranış Özellikleri</label>
-                        <textarea name="behavior" rows="3" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Karakteri, alışkanlıkları, korkuları, sevdiği oyunlar..."></textarea>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Favori Oyuncağı</label>
-                            <input type="text" name="favoriteToy" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="En sevdiği oyuncak">
+                <!-- Social Media Tab -->
+                <div id="socialTab" class="tab-content hidden">
+                    <div class="space-y-6">
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Instagram</label>
+                            <div class="relative">
+                                <span class="social-icon">📷</span>
+                                <input type="url" name="instagram" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://instagram.com/username">
+                            </div>
                         </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Favori Yemeği</label>
-                            <input type="text" name="favoriteFood" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="En sevdiği yemek/ödül">
+                        
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">TikTok</label>
+                            <div class="relative">
+                                <span class="social-icon">🎵</span>
+                                <input type="url" name="tiktok" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://tiktok.com/@username">
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Özel Notlar</label>
-                        <textarea name="specialNotes" rows="3" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="Bulan kişinin bilmesi gereken özel durumlar..."></textarea>
-                    </div>
-
-                    <div id="customFields" class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2">Özel Alanlar</label>
-                        <div id="customFieldsList" class="space-y-2 mb-4">
-                            <!-- Custom fields will be added here -->
+                        
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">YouTube</label>
+                            <div class="relative">
+                                <span class="social-icon">📺</span>
+                                <input type="url" name="youtube" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://youtube.com/channel/...">
+                            </div>
                         </div>
-                        <button type="button" id="addCustomField" class="text-purple-600 hover:text-purple-800 text-sm font-medium">+ Yeni Alan Ekle</button>
+                        
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Facebook</label>
+                            <div class="relative">
+                                <span class="social-icon">👥</span>
+                                <input type="url" name="facebook" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://facebook.com/username">
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Twitter/X</label>
+                            <div class="relative">
+                                <span class="social-icon">🐦</span>
+                                <input type="url" name="twitter" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://twitter.com/username">
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Website</label>
+                            <div class="relative">
+                                <span class="social-icon">🌐</span>
+                                <input type="url" name="website" class="social-input form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" placeholder="https://website.com">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -668,15 +593,36 @@
         </div>
     </div>
 
-    <!-- Locations Modal -->
-    <div id="locationsModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold mb-6 text-center">👤 Profili Düzenle</h3>
+            <form id="editProfileForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Ad Soyad</label>
+                    <input type="text" id="editName" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Telefon Numarası</label>
+                    <input type="tel" id="editPhone" class="form-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500" required pattern="[0-9]{11}" maxlength="11">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Güncelle
+                    </button>
+                    <button type="button" id="closeEditProfileModal" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded-lg">
+                        İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pet Details Modal -->
+    <div id="petDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 modal hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">📍 Gönderilen Konumlar</h3>
-                <button id="closeLocationsModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-            </div>
-            <div id="locationsContent">
-                <!-- Locations will be loaded here -->
+            <div id="petDetailsContent">
+                <!-- Pet details content will be loaded here -->
             </div>
         </div>
     </div>
@@ -693,18 +639,15 @@
         let currentPet = null;
         let petStats = {};
         let currentTab = 'basic';
-        let photoGallery = [];
+        let uploadedPhotos = [];
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             // Check URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const petId = urlParams.get('pet');
-            const isAdmin = urlParams.get('admin');
             
-            if (isAdmin === 'true') {
-                showAdminLogin();
-            } else if (petId) {
+            if (petId) {
                 showPetProfile(petId);
             }
             
@@ -714,36 +657,24 @@
 
         // Firebase Authentication
         function initializeFirebaseAuth() {
-            // Set up auth state listener with persistence
             const unsubscribe = window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-                console.log('Auth state changed:', user ? 'User logged in' : 'User logged out');
-                
                 if (user) {
-                    // User is signed in - ensure persistence is set
                     try {
                         await window.firebaseSetPersistence(window.firebaseAuth, window.firebaseBrowserLocalPersistence);
-                        console.log('Persistence set successfully');
                     } catch (error) {
                         console.log('Persistence already set or failed:', error);
                     }
                     
-                    console.log('Loading user profile for:', user.email);
                     loadUserProfile(user);
                 } else {
-                    // User is signed out
-                    console.log('User signed out, clearing data');
                     currentUser = null;
                     pets = [];
                     petStats = {};
                     updateNavigation();
                     showWelcomeSection();
                 }
-            }, (error) => {
-                console.error('Auth state change error:', error);
-                showNotification('Kimlik doğrulama hatası: ' + error.message, 'error');
             });
 
-            // Store unsubscribe function globally for cleanup if needed
             window.authUnsubscribe = unsubscribe;
         }
 
@@ -756,7 +687,6 @@
                     showUserDashboard();
                     updateNavigation();
                 } else {
-                    // Create user profile if doesn't exist
                     currentUser = {
                         uid: user.uid,
                         email: user.email,
@@ -776,7 +706,6 @@
 
         async function loadUserPets() {
             try {
-                // Simple query without orderBy to avoid index issues
                 const petsQuery = window.firestoreQuery(
                     window.firestoreCollection(window.firebaseDb, 'pets'),
                     window.firestoreWhere('ownerId', '==', currentUser.uid)
@@ -792,41 +721,16 @@
                     petStats[doc.id] = petData.stats || { views: 0, calls: 0, locations: [], visitors: [] };
                 });
                 
-                // Sort pets by creation date in JavaScript
                 pets.sort((a, b) => {
                     const dateA = new Date(a.createdAt || 0);
                     const dateB = new Date(b.createdAt || 0);
-                    return dateB - dateA; // Newest first
+                    return dateB - dateA;
                 });
                 
                 renderPetsList();
             } catch (error) {
                 console.error('Error loading pets:', error);
-                // Try to load without any query filters as fallback
-                try {
-                    const allPetsSnapshot = await window.firestoreGetDocs(window.firestoreCollection(window.firebaseDb, 'pets'));
-                    pets = [];
-                    petStats = {};
-                    
-                    allPetsSnapshot.forEach((doc) => {
-                        const petData = { id: doc.id, ...doc.data() };
-                        if (petData.ownerId === currentUser.uid) {
-                            pets.push(petData);
-                            petStats[doc.id] = petData.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                        }
-                    });
-                    
-                    pets.sort((a, b) => {
-                        const dateA = new Date(a.createdAt || 0);
-                        const dateB = new Date(b.createdAt || 0);
-                        return dateB - dateA;
-                    });
-                    
-                    renderPetsList();
-                } catch (fallbackError) {
-                    console.error('Fallback loading also failed:', fallbackError);
-                    showNotification('Hayvan profilleri yüklenirken hata oluştu! Lütfen sayfayı yenileyin.', 'error');
-                }
+                showNotification('Hayvan profilleri yüklenirken hata oluştu!', 'error');
             }
         }
 
@@ -836,8 +740,6 @@
                 e.preventDefault();
                 showModal('loginModal');
             });
-            
-
             
             document.getElementById('logoutBtn').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -850,16 +752,14 @@
                 hideModal('loginModal');
             });
             
-
-            
             document.getElementById('closeAddPetModal').addEventListener('click', function(e) {
                 e.preventDefault();
                 hideModal('addPetModal');
             });
             
-            document.getElementById('closeLocationsModal').addEventListener('click', function(e) {
+            document.getElementById('closeEditProfileModal').addEventListener('click', function(e) {
                 e.preventDefault();
-                hideModal('locationsModal');
+                hideModal('editProfileModal');
             });
             
             // Dashboard buttons
@@ -868,16 +768,16 @@
                 showModal('addPetModal');
             });
             
+            document.getElementById('editProfileBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                showEditProfileModal();
+            });
+            
             // Form submissions
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
-
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
             document.getElementById('addPetForm').addEventListener('submit', handleAddPet);
-            
-            // Custom field button
-            document.getElementById('addCustomField').addEventListener('click', function(e) {
-                e.preventDefault();
-                addCustomField();
-            });
+            document.getElementById('editProfileForm').addEventListener('submit', handleEditProfile);
             
             // Close modals on backdrop click
             document.querySelectorAll('.modal').forEach(modal => {
@@ -900,27 +800,12 @@
             }
             
             try {
-                console.log('Attempting login for:', email);
-                
-                // Set persistence before login to ensure session persists
                 await window.firebaseSetPersistence(window.firebaseAuth, window.firebaseBrowserLocalPersistence);
-                console.log('Persistence set before login');
-                
                 const userCredential = await window.firebaseSignIn(window.firebaseAuth, email, password);
-                console.log('Login successful:', userCredential.user.email);
-                
-                // Double-check persistence after login
-                try {
-                    await window.firebaseSetPersistence(window.firebaseAuth, window.firebaseBrowserLocalPersistence);
-                    console.log('Persistence confirmed after login');
-                } catch (persistError) {
-                    console.log('Persistence already set:', persistError);
-                }
                 
                 hideModal('loginModal');
-                showNotification('Giriş başarılı! Oturum kalıcı olarak açıldı!', 'success');
+                showNotification('Giriş başarılı!', 'success');
                 
-                // Clear form
                 document.getElementById('loginEmail').value = '';
                 document.getElementById('loginPassword').value = '';
                 
@@ -938,9 +823,6 @@
                     case 'auth/invalid-email':
                         errorMessage = 'Geçersiz e-posta adresi!';
                         break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin.';
-                        break;
                     case 'auth/invalid-credential':
                         errorMessage = 'Geçersiz giriş bilgileri!';
                         break;
@@ -952,7 +834,71 @@
             }
         }
 
-
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!name || !email || !phone || !password) {
+                showNotification('Tüm alanlar gerekli!', 'error');
+                return;
+            }
+            
+            if (!/^[0-9]{11}$/.test(phone)) {
+                showNotification('Telefon numarası 11 haneli olmalı!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('Şifre en az 6 karakter olmalı!', 'error');
+                return;
+            }
+            
+            try {
+                await window.firebaseSetPersistence(window.firebaseAuth, window.firebaseBrowserLocalPersistence);
+                const userCredential = await window.firebaseCreateUser(window.firebaseAuth, email, password);
+                
+                const userData = {
+                    uid: userCredential.user.uid,
+                    email: email,
+                    name: name,
+                    phone: phone,
+                    registrationDate: new Date().toISOString()
+                };
+                
+                await window.firestoreSetDoc(window.firestoreDoc(window.firebaseDb, 'users', userCredential.user.uid), userData);
+                
+                hideModal('loginModal');
+                showNotification('Kayıt başarılı! Hoş geldiniz!', 'success');
+                
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPhone').value = '';
+                document.getElementById('registerPassword').value = '';
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                let errorMessage = 'Kayıt başarısız!';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Bu e-posta adresi zaten kullanımda!';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Geçersiz e-posta adresi!';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Şifre çok zayıf!';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
+            }
+        }
 
         async function handleAddPet(e) {
             e.preventDefault();
@@ -963,20 +909,6 @@
             
             const formData = new FormData(e.target);
             
-            // Get custom fields
-            const customFields = [];
-            const customFieldsDiv = document.getElementById('customFieldsList');
-            const customFieldInputs = customFieldsDiv.querySelectorAll('div');
-            customFieldInputs.forEach(div => {
-                const inputs = div.querySelectorAll('input');
-                if (inputs.length === 2 && inputs[0].value && inputs[1].value) {
-                    customFields.push({
-                        label: inputs[0].value,
-                        value: inputs[1].value
-                    });
-                }
-            });
-            
             const petData = {
                 name: formData.get('petName'),
                 type: formData.get('petType'),
@@ -984,30 +916,19 @@
                 birthDate: formData.get('birthDate') || '',
                 gender: formData.get('gender') || '',
                 color: formData.get('color') || '',
-                weight: formData.get('weight') || '',
-                microchip: formData.get('microchip') || '',
                 description: formData.get('description') || '',
-                neutered: formData.get('neutered') || '',
-                childFriendly: formData.get('childFriendly') || '',
-                photo: formData.get('photo') || '',
-                photoGallery: [...photoGallery],
-                instagram: formData.get('instagram') || '',
-                facebook: formData.get('facebook') || '',
-                tiktok: formData.get('tiktok') || '',
-                youtube: formData.get('youtube') || '',
                 health: formData.get('health') || '',
-                lastVaccination: formData.get('lastVaccination') || '',
-                nextVaccination: formData.get('nextVaccination') || '',
                 vetName: formData.get('vetName') || '',
                 vetPhone: formData.get('vetPhone') || '',
                 vetAddress: formData.get('vetAddress') || '',
                 emergencyInstructions: formData.get('emergencyInstructions') || '',
-                feeding: formData.get('feeding') || '',
-                behavior: formData.get('behavior') || '',
-                favoriteToy: formData.get('favoriteToy') || '',
-                favoriteFood: formData.get('favoriteFood') || '',
-                specialNotes: formData.get('specialNotes') || '',
-                customFields: customFields,
+                instagram: formData.get('instagram') || '',
+                tiktok: formData.get('tiktok') || '',
+                youtube: formData.get('youtube') || '',
+                facebook: formData.get('facebook') || '',
+                twitter: formData.get('twitter') || '',
+                website: formData.get('website') || '',
+                photos: uploadedPhotos,
                 ownerId: currentUser.uid,
                 ownerName: currentUser.name,
                 ownerEmail: currentUser.email,
@@ -1019,20 +940,15 @@
             try {
                 const docRef = await window.firestoreAddDoc(window.firestoreCollection(window.firebaseDb, 'pets'), petData);
                 
-                // Add link to pet data
                 const petLink = `${window.location.origin}${window.location.pathname}?pet=${docRef.id}`;
                 await window.firestoreUpdateDoc(docRef, { link: petLink });
                 
                 hideModal('addPetModal');
                 showNotification('Hayvan profili başarıyla oluşturuldu!', 'success');
                 
-                // Reset form and galleries
                 e.target.reset();
-                photoGallery = [];
-                updatePhotoGallery();
-                document.getElementById('customFieldsList').innerHTML = '';
-                
-                // Reload pets
+                uploadedPhotos = [];
+                document.getElementById('photoPreview').innerHTML = '';
                 await loadUserPets();
                 
             } catch (error) {
@@ -1041,28 +957,101 @@
             }
         }
 
+        async function handleEditProfile(e) {
+            e.preventDefault();
+            if (!currentUser) return;
+            
+            const name = document.getElementById('editName').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            
+            if (!name || !phone) {
+                showNotification('Tüm alanlar gerekli!', 'error');
+                return;
+            }
+            
+            if (!/^[0-9]{11}$/.test(phone)) {
+                showNotification('Telefon numarası 11 haneli olmalı!', 'error');
+                return;
+            }
+            
+            try {
+                const updatedData = { name, phone };
+                await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'users', currentUser.uid), updatedData);
+                
+                currentUser.name = name;
+                currentUser.phone = phone;
+                
+                hideModal('editProfileModal');
+                showNotification('Profil başarıyla güncellendi!', 'success');
+                updateNavigation();
+                
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showNotification('Profil güncellenirken hata oluştu!', 'error');
+            }
+        }
+
+        function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files);
+            
+            files.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Fotoğraf boyutu 5MB\'dan küçük olmalı!', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoData = {
+                        id: Date.now() + Math.random(),
+                        data: e.target.result,
+                        name: file.name
+                    };
+                    
+                    uploadedPhotos.push(photoData);
+                    renderPhotoPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderPhotoPreview() {
+            const photoPreview = document.getElementById('photoPreview');
+            photoPreview.innerHTML = '';
+            
+            uploadedPhotos.forEach(photo => {
+                const photoDiv = document.createElement('div');
+                photoDiv.className = 'photo-preview relative rounded-lg overflow-hidden';
+                photoDiv.innerHTML = `
+                    <img src="${photo.data}" alt="${photo.name}" class="w-full h-32 object-cover">
+                    <button type="button" class="delete-photo" onclick="removePhoto('${photo.id}')">×</button>
+                `;
+                photoPreview.appendChild(photoDiv);
+            });
+        }
+
+        function removePhoto(photoId) {
+            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
+            renderPhotoPreview();
+        }
+
         async function logout() {
             try {
-                console.log('Logging out user...');
                 await window.firebaseSignOut(window.firebaseAuth);
                 
-                // Clear all user data immediately
                 currentUser = null;
                 pets = [];
                 petStats = {};
                 
-                // Update UI immediately
                 updateNavigation();
                 showWelcomeSection();
                 
                 showNotification('Güvenli çıkış yapıldı!', 'success');
-                console.log('User logged out successfully');
                 
             } catch (error) {
                 console.error('Logout error:', error);
                 showNotification('Çıkış yapılırken hata oluştu: ' + error.message, 'error');
                 
-                // Force logout even if there's an error
                 currentUser = null;
                 pets = [];
                 petStats = {};
@@ -1106,6 +1095,14 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
+        function showEditProfileModal() {
+            if (!currentUser) return;
+            
+            document.getElementById('editName').value = currentUser.name || '';
+            document.getElementById('editPhone').value = currentUser.phone || '';
+            showModal('editProfileModal');
+        }
+
         function switchTab(tabName) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
@@ -1115,56 +1112,41 @@
             // Remove active class from all buttons
             document.querySelectorAll('.tab-button').forEach(btn => {
                 btn.classList.remove('active');
+                btn.classList.remove('bg-purple-600', 'text-white');
+                btn.classList.add('text-gray-600');
             });
             
-            // Show selected tab
+            // Show selected tab content
             document.getElementById(tabName + 'Tab').classList.remove('hidden');
             
             // Add active class to clicked button
-            event.target.classList.add('active');
+            event.target.classList.add('active', 'bg-purple-600', 'text-white');
+            event.target.classList.remove('text-gray-600');
             
             currentTab = tabName;
         }
 
-        function addPhoto() {
-            const url = document.getElementById('newPhotoUrl').value.trim();
-            if (url) {
-                photoGallery.push(url);
-                updatePhotoGallery();
-                document.getElementById('newPhotoUrl').value = '';
-            }
-        }
-
-        function updatePhotoGallery() {
-            const photoList = document.getElementById('photoList');
-            photoList.innerHTML = '';
+        function switchLoginTab(tabName) {
+            const loginFormDiv = document.getElementById('loginFormDiv');
+            const registerFormDiv = document.getElementById('registerFormDiv');
+            const loginTabBtn = document.getElementById('loginTabBtn');
+            const registerTabBtn = document.getElementById('registerTabBtn');
             
-            photoGallery.forEach((photo, index) => {
-                const photoDiv = document.createElement('div');
-                photoDiv.className = 'relative';
-                photoDiv.innerHTML = `
-                    <img src="${photo}" alt="Photo ${index + 1}" class="w-full h-24 object-cover rounded-lg" onerror="this.parentElement.style.display='none'">
-                    <button type="button" onclick="removePhoto(${index})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600">×</button>
-                `;
-                photoList.appendChild(photoDiv);
-            });
-        }
-
-        function removePhoto(index) {
-            photoGallery.splice(index, 1);
-            updatePhotoGallery();
-        }
-
-        function addCustomField() {
-            const customFieldsList = document.getElementById('customFieldsList');
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'flex gap-2';
-            fieldDiv.innerHTML = `
-                <input type="text" placeholder="Alan adı" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg">
-                <input type="text" placeholder="Değer" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg">
-                <button type="button" onclick="this.parentElement.remove()" class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600">×</button>
-            `;
-            customFieldsList.appendChild(fieldDiv);
+            if (tabName === 'login') {
+                loginFormDiv.classList.remove('hidden');
+                registerFormDiv.classList.add('hidden');
+                loginTabBtn.classList.add('bg-purple-600', 'text-white');
+                loginTabBtn.classList.remove('text-gray-600');
+                registerTabBtn.classList.remove('bg-purple-600', 'text-white');
+                registerTabBtn.classList.add('text-gray-600');
+            } else {
+                loginFormDiv.classList.add('hidden');
+                registerFormDiv.classList.remove('hidden');
+                registerTabBtn.classList.add('bg-purple-600', 'text-white');
+                registerTabBtn.classList.remove('text-gray-600');
+                loginTabBtn.classList.remove('bg-purple-600', 'text-white');
+                loginTabBtn.classList.add('text-gray-600');
+            }
         }
 
         function renderPetsList() {
@@ -1194,20 +1176,17 @@
                 petCard.innerHTML = `
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-xl font-bold text-gray-900">${pet.name}</h3>
-                        <div class="flex gap-2">
-                            <button onclick="deletePet('${pet.id}')" class="text-red-600 hover:text-red-800 p-2">🗑️</button>
-                        </div>
+                        <button onclick="showPetDetails('${pet.id}')" class="text-purple-600 hover:text-purple-800">
+                            ⚙️
+                        </button>
                     </div>
                     
-                    <div class="flex items-center gap-4 mb-4">
-                        ${pet.photo ? `<img src="${pet.photo}" alt="${pet.name}" class="w-16 h-16 rounded-full object-cover" onerror="this.style.display='none'">` : ''}
-                        <div>
-                            <p class="text-gray-600">${pet.type} ${pet.breed ? `- ${pet.breed}` : ''}</p>
-                            <p class="text-sm text-gray-500">${pet.gender || ''} ${pet.color ? `• ${pet.color}` : ''}</p>
-                        </div>
+                    <div class="mb-4">
+                        <p class="text-gray-600">${pet.type} ${pet.breed ? `- ${pet.breed}` : ''}</p>
+                        <p class="text-sm text-gray-500">${pet.gender || ''} ${pet.color ? `• ${pet.color}` : ''}</p>
                     </div>
                     
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="text-center p-3 bg-blue-50 rounded-lg">
                             <div class="text-2xl font-bold text-blue-600">${stats.views}</div>
                             <div class="text-sm text-gray-600">Görüntülenme</div>
@@ -1216,54 +1195,7 @@
                             <div class="text-2xl font-bold text-green-600">${stats.calls}</div>
                             <div class="text-sm text-gray-600">Arama</div>
                         </div>
-                        <div class="text-center p-3 bg-purple-50 rounded-lg">
-                            <div class="text-2xl font-bold text-purple-600">${stats.visitors ? stats.visitors.length : 0}</div>
-                            <div class="text-sm text-gray-600">Ziyaretçi</div>
-                        </div>
-                        <div class="text-center p-3 bg-orange-50 rounded-lg cursor-pointer" onclick="showLocations('${pet.id}')">
-                            <div class="text-2xl font-bold text-orange-600">${stats.locations ? stats.locations.length : 0}</div>
-                            <div class="text-sm text-gray-600">Konum 📍</div>
-                        </div>
                     </div>
-                    
-                    ${stats.visitors && stats.visitors.length > 0 ? `
-                    <div class="mb-4">
-                        <h4 class="font-semibold text-gray-700 mb-2">🌍 Son Ziyaretçiler</h4>
-                        <div class="space-y-2 max-h-32 overflow-y-auto">
-                            ${stats.visitors.slice(-5).reverse().map(visitor => `
-                                <div class="visitor-card text-white p-2 rounded text-xs">
-                                    <div class="flex justify-between items-center">
-                                        <span>${visitor.city}, ${visitor.country}</span>
-                                        <span>${new Date(visitor.timestamp).toLocaleDateString('tr-TR')}</span>
-                                    </div>
-                                    <div class="text-xs opacity-80">${visitor.ip} • ${visitor.isp}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    ` : ''}
-                    
-                    ${stats.locations && stats.locations.length > 0 ? `
-                    <div class="mb-4 p-4 location-alert rounded-lg border-l-4 border-red-500 shadow-lg">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-bold text-orange-800">🚨 YENİ KONUM BİLDİRİMİ!</h4>
-                            <span class="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                                ${stats.locations.length} KONUM
-                            </span>
-                        </div>
-                        <div class="text-sm text-gray-700 mb-3">
-                            <strong>Son konum:</strong> ${new Date(stats.locations[stats.locations.length - 1].timestamp).toLocaleString('tr-TR')}
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="showLocations('${pet.id}')" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded text-xs font-medium">
-                                📍 Tüm Konumları Gör
-                            </button>
-                            <button onclick="openLastLocation('${pet.id}')" class="bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-xs font-medium">
-                                🗺️ Son Konuma Git
-                            </button>
-                        </div>
-                    </div>
-                    ` : ''}
                     
                     <div class="space-y-2">
                         <button onclick="window.open('${pet.link}', '_blank')" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg text-sm">
@@ -1272,22 +1204,434 @@
                         <button onclick="copyLink('${pet.link}')" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg text-sm">
                             📋 Linki Kopyala
                         </button>
+                        <button onclick="generateQRCode('${pet.link}', '${pet.name}')" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg text-sm">
+                            📱 QR Kod Oluştur
+                        </button>
                     </div>
                 `;
                 petsList.appendChild(petCard);
             });
         }
 
-        async function deletePet(petId) {
-            if (confirm('Bu hayvan profilini silmek istediğinizden emin misiniz?')) {
-                try {
-                    await window.firestoreDeleteDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                    showNotification('Hayvan profili silindi!', 'success');
-                    await loadUserPets();
-                } catch (error) {
-                    console.error('Error deleting pet:', error);
-                    showNotification('Hayvan profili silinirken hata oluştu!', 'error');
+        function showPetDetails(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            const stats = petStats[petId] || { views: 0, calls: 0, locations: [], visitors: [] };
+            
+            const petDetailsContent = document.getElementById('petDetailsContent');
+            petDetailsContent.innerHTML = `
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold">🐾 ${pet.name} - Detaylar</h3>
+                    <button onclick="hideModal('petDetailsModal')" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-blue-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-blue-600">${stats.views}</div>
+                        <div class="text-sm text-gray-600">Görüntülenme</div>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-green-600">${stats.calls}</div>
+                        <div class="text-sm text-gray-600">Arama</div>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-purple-600">${stats.locations?.length || 0}</div>
+                        <div class="text-sm text-gray-600">Konum Bildirimi</div>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg text-center">
+                        <div class="text-2xl font-bold text-orange-600">${stats.visitors?.length || 0}</div>
+                        <div class="text-sm text-gray-600">Ziyaretçi</div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <button onclick="window.open('${pet.link}', '_blank')" class="bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg">
+                        🔗 Profili Görüntüle
+                    </button>
+                    <button onclick="copyLink('${pet.link}')" class="bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg">
+                        📋 Linki Kopyala
+                    </button>
+                    <button onclick="generateQRCode('${pet.link}', '${pet.name}')" class="bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg">
+                        📱 QR Kod Oluştur
+                    </button>
+                </div>
+                
+                <!-- Recent Locations -->
+                ${stats.locations && stats.locations.length > 0 ? `
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold text-red-800 mb-3">📍 Son Konum Bildirimleri</h4>
+                    <div class="space-y-3">
+                        ${stats.locations.slice(-5).reverse().map(location => `
+                            <div class="bg-white rounded-lg p-3 border border-red-100">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-red-800">${location.address || `Lat: ${location.latitude.toFixed(6)}, Lng: ${location.longitude.toFixed(6)}`}</p>
+                                        <p class="text-xs text-red-600 mt-1">
+                                            ${new Date(location.timestamp).toLocaleString('tr-TR')}
+                                            ${location.accuracy ? ` • Doğruluk: ±${Math.round(location.accuracy)}m` : ''}
+                                        </p>
+                                    </div>
+                                    <button onclick="openInMaps(${location.latitude}, ${location.longitude})" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
+                                        🗺️ Harita
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${stats.locations.length > 5 ? `
+                    <div class="text-center mt-3">
+                        <button onclick="showAllLocations('${petId}')" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                            Tüm Konumları Göster (${stats.locations.length})
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                <!-- Recent Visitors -->
+                ${stats.visitors && stats.visitors.length > 0 ? `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-800 mb-3">👥 Son Ziyaretçiler</h4>
+                    <div class="space-y-2">
+                        ${stats.visitors.slice(-10).reverse().map(visitor => `
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-blue-700">${visitor.city || 'Bilinmiyor'}, ${visitor.country || 'Bilinmiyor'}</span>
+                                <span class="text-blue-600">${new Date(visitor.timestamp).toLocaleString('tr-TR')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            showModal('petDetailsModal');
+        }
+
+        async function showPetProfile(petId) {
+            try {
+                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
+                
+                if (!petDoc.exists()) {
+                    showNotification('Hayvan profili bulunamadı!', 'error');
+                    return;
                 }
+                
+                const pet = { id: petDoc.id, ...petDoc.data() };
+                currentPet = pet;
+                
+                await updatePetStats(petId);
+                
+                document.getElementById('welcomeSection').classList.add('hidden');
+                document.getElementById('userDashboard').classList.add('hidden');
+                document.getElementById('petProfileView').classList.remove('hidden');
+                
+                renderPetProfile(pet);
+                
+            } catch (error) {
+                console.error('Error loading pet profile:', error);
+                showNotification('Hayvan profili yüklenirken hata oluştu!', 'error');
+            }
+        }
+
+        async function updatePetStats(petId) {
+            try {
+                const visitorInfo = await getVisitorInfo();
+                
+                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
+                const currentStats = petDoc.data().stats || { views: 0, calls: 0, locations: [], visitors: [] };
+                
+                const updatedStats = {
+                    ...currentStats,
+                    views: (currentStats.views || 0) + 1,
+                    visitors: [...(currentStats.visitors || []), visitorInfo]
+                };
+                
+                await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
+                    stats: updatedStats
+                });
+                
+            } catch (error) {
+                console.error('Error updating pet stats:', error);
+            }
+        }
+
+        async function getVisitorInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                return {
+                    ip: data.ip,
+                    city: data.city,
+                    country: data.country_name,
+                    isp: data.org,
+                    timestamp: new Date().toISOString()
+                };
+            } catch (error) {
+                return {
+                    ip: 'Unknown',
+                    city: 'Unknown',
+                    country: 'Unknown',
+                    isp: 'Unknown',
+                    timestamp: new Date().toISOString()
+                };
+            }
+        }
+
+        function renderPetProfile(pet) {
+            const petProfileContent = document.getElementById('petProfileContent');
+            
+            petProfileContent.innerHTML = `
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <!-- Header -->
+                    <div class="gradient-bg text-white p-8 text-center">
+                        <h1 class="text-4xl font-bold mb-2">${pet.name}</h1>
+                        <p class="text-xl opacity-90">${pet.type} ${pet.breed ? `• ${pet.breed}` : ''}</p>
+                        ${pet.gender || pet.color ? `<p class="opacity-80">${pet.gender || ''} ${pet.color ? `• ${pet.color}` : ''}</p>` : ''}
+                    </div>
+                    
+                    <!-- Photo Gallery -->
+                    ${pet.photos && pet.photos.length > 0 ? `
+                    <div class="p-6 bg-gray-50 border-b">
+                        <h3 class="text-xl font-semibold mb-4">📸 Fotoğraflar</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            ${pet.photos.map(photo => `
+                                <div class="rounded-lg overflow-hidden shadow-md">
+                                    <img src="${photo.data}" alt="${photo.name}" class="w-full h-32 object-cover hover:scale-105 transition-transform cursor-pointer" onclick="openPhotoModal('${photo.data}')">
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- Contact Buttons -->
+                    <div class="p-6 bg-gray-50 border-b">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <button onclick="callOwner('${pet.ownerPhone}')" class="call-button text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">
+                                📞 Sahibini Ara: ${pet.ownerPhone}
+                            </button>
+                            <button onclick="sendLocation('${pet.id}')" class="emergency-button text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all">
+                                📍 Konumumu Gönder
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Pet Information -->
+                    <div class="p-8">
+                        <!-- Basic Info -->
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            ${pet.birthDate ? `
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-1">🎂 Doğum Tarihi</h3>
+                                <p class="text-blue-700">${new Date(pet.birthDate).toLocaleDateString('tr-TR')}</p>
+                            </div>
+                            ` : ''}
+                            ${pet.gender ? `
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-800 mb-1">⚧ Cinsiyet</h3>
+                                <p class="text-purple-700">${pet.gender}</p>
+                            </div>
+                            ` : ''}
+                            ${pet.color ? `
+                            <div class="bg-yellow-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-yellow-800 mb-1">🎨 Renk/Desen</h3>
+                                <p class="text-yellow-700">${pet.color}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Description -->
+                        ${pet.description ? `
+                        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-3">📝 Hakkında</h3>
+                            <p class="text-gray-700 leading-relaxed">${pet.description}</p>
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Health Information -->
+                        ${pet.health ? `
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                            <h3 class="text-lg font-semibold text-red-800 mb-2">🏥 Sağlık Durumu</h3>
+                            <p class="text-red-700">${pet.health}</p>
+                        </div>
+                        ` : ''}
+
+                        <!-- Veterinary Information -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                            <h3 class="text-xl font-semibold text-blue-800 mb-4">🩺 Veteriner Bilgileri</h3>
+                            ${pet.vetName ? `<p class="text-blue-700 mb-3"><strong>Veteriner Adı:</strong> ${pet.vetName}</p>` : `<p class="text-blue-700 mb-3"><strong>Veteriner Adı:</strong> Belirtilmemiş</p>`}
+                            ${pet.vetPhone ? `
+                            <p class="text-blue-700 mb-3">
+                                <strong>Veteriner Telefon:</strong> 
+                                <button onclick="window.open('tel:${pet.vetPhone}', '_blank')" class="call-button text-white px-3 py-1 rounded-lg ml-2 hover:opacity-90 cursor-pointer">
+                                    📞 ${pet.vetPhone}
+                                </button>
+                            </p>
+                            ` : `<p class="text-blue-700 mb-3"><strong>Veteriner Telefon:</strong> Belirtilmemiş</p>`}
+                            ${pet.vetAddress ? `<p class="text-blue-700 mb-3"><strong>Veteriner Adresi:</strong> ${pet.vetAddress}</p>` : `<p class="text-blue-700 mb-3"><strong>Veteriner Adresi:</strong> Belirtilmemiş</p>`}
+                        </div>
+
+                        ${pet.emergencyInstructions ? `
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <h3 class="text-lg font-semibold text-yellow-800 mb-2">⚠️ Acil Durum Talimatları</h3>
+                            <p class="text-yellow-700">${pet.emergencyInstructions}</p>
+                        </div>
+                        ` : ''}
+
+                        <!-- Social Media Links -->
+                        ${(pet.instagram || pet.tiktok || pet.youtube || pet.facebook || pet.twitter || pet.website) ? `
+                        <div class="bg-gradient-to-r from-pink-50 to-purple-50 border border-purple-200 rounded-lg p-6">
+                            <h3 class="text-xl font-semibold text-purple-800 mb-4">🌐 Sosyal Medya</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                ${pet.instagram ? `<a href="${pet.instagram}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">📷 Instagram</a>` : ''}
+                                ${pet.tiktok ? `<a href="${pet.tiktok}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-black text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">🎵 TikTok</a>` : ''}
+                                ${pet.youtube ? `<a href="${pet.youtube}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-red-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">📺 YouTube</a>` : ''}
+                                ${pet.facebook ? `<a href="${pet.facebook}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">👥 Facebook</a>` : ''}
+                                ${pet.twitter ? `<a href="${pet.twitter}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-blue-400 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">🐦 Twitter</a>` : ''}
+                                ${pet.website ? `<a href="${pet.website}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center bg-gray-600 text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity">🌐 Website</a>` : ''}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function callOwner(phone) {
+            window.open(`tel:${phone}`, '_blank');
+        }
+
+        function sendLocation(petId) {
+            if (navigator.geolocation) {
+                // Show loading notification
+                showNotification('Konum alınıyor...', 'info');
+                
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    try {
+                        const locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: new Date().toISOString(),
+                            address: 'Adres alınıyor...'
+                        };
+                        
+                        // Get address from coordinates
+                        try {
+                            const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${locationData.latitude}+${locationData.longitude}&key=demo&language=tr&pretty=1`);
+                            const data = await response.json();
+                            if (data.results && data.results[0]) {
+                                locationData.address = data.results[0].formatted;
+                            }
+                        } catch (addressError) {
+                            console.log('Address lookup failed:', addressError);
+                            locationData.address = `Lat: ${locationData.latitude.toFixed(6)}, Lng: ${locationData.longitude.toFixed(6)}`;
+                        }
+                        
+                        const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
+                        const currentStats = petDoc.data().stats || { views: 0, calls: 0, locations: [], visitors: [] };
+                        
+                        const updatedStats = {
+                            ...currentStats,
+                            locations: [...(currentStats.locations || []), locationData]
+                        };
+                        
+                        await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
+                            stats: updatedStats
+                        });
+                        
+                        // Show success with location details
+                        showLocationConfirmation(locationData);
+                        
+                    } catch (error) {
+                        console.error('Error sending location:', error);
+                        showNotification('Konum gönderilirken hata oluştu!', 'error');
+                    }
+                }, (error) => {
+                    let errorMessage = 'Konum alınamadı. ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage += 'Konum izni verilmedi.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage += 'Konum bilgisi mevcut değil.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage += 'Konum alma zaman aşımına uğradı.';
+                            break;
+                        default:
+                            errorMessage += 'Bilinmeyen hata.';
+                            break;
+                    }
+                    showNotification(errorMessage, 'error');
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                });
+            } else {
+                showNotification('Tarayıcınız konum özelliğini desteklemiyor.', 'error');
+            }
+        }
+
+        function showLocationConfirmation(locationData) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+                    <div class="text-center mb-6">
+                        <div class="text-6xl mb-4">✅</div>
+                        <h3 class="text-2xl font-bold text-green-600 mb-2">Konum Başarıyla Gönderildi!</h3>
+                        <p class="text-gray-600">Hayvan sahibi konumunuzu görebilecek.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold mb-2">📍 Gönderilen Konum:</h4>
+                        <p class="text-sm text-gray-700 mb-2">${locationData.address}</p>
+                        <p class="text-xs text-gray-500">
+                            Koordinatlar: ${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            Doğruluk: ±${Math.round(locationData.accuracy)}m
+                        </p>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button onclick="openInMaps(${locationData.latitude}, ${locationData.longitude})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm">
+                            🗺️ Haritada Göster
+                        </button>
+                        <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg text-sm">
+                            Kapat
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Auto close after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(modal)) {
+                    modal.remove();
+                }
+            }, 10000);
+        }
+
+        function openInMaps(lat, lng) {
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Try to open in native maps app
+                window.open(`geo:${lat},${lng}`, '_blank');
+                // Fallback to Google Maps
+                setTimeout(() => {
+                    window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+                }, 1000);
+            } else {
+                // Desktop - open Google Maps
+                window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
             }
         }
 
@@ -1299,405 +1643,106 @@
             });
         }
 
-        async function showPetProfile(petId) {
-            try {
-                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                if (!petDoc.exists()) {
-                    showNotification('Hayvan profili bulunamadı!', 'error');
-                    return;
-                }
-                
-                const pet = petDoc.data();
-                
-                // Update view count
-                const newStats = pet.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                newStats.views = (newStats.views || 0) + 1;
-                
-                await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
-                    stats: newStats
-                });
-                
-                // Track visitor location
-                trackVisitor(petId);
-                
-                // Show pet profile
-                document.getElementById('welcomeSection').classList.add('hidden');
-                document.getElementById('userDashboard').classList.add('hidden');
-                document.getElementById('petProfileView').classList.remove('hidden');
-                
-                renderPetProfile(pet, petId);
-                
-            } catch (error) {
-                console.error('Error loading pet profile:', error);
-                showNotification('Hayvan profili yüklenirken hata oluştu!', 'error');
-            }
-        }
-
-        function renderPetProfile(pet, petId) {
-            const profileContent = document.getElementById('petProfileContent');
-            
-            const age = pet.birthDate ? calculateAge(pet.birthDate) : '';
-            
-            profileContent.innerHTML = `
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    <!-- Header -->
-                    <div class="gradient-bg text-white p-8 text-center">
-                        ${pet.photo ? `<img src="${pet.photo}" alt="${pet.name}" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-lg object-cover" onerror="this.style.display='none'">` : ''}
-                        <h1 class="text-4xl font-bold mb-2">${pet.name}</h1>
-                        <p class="text-xl opacity-90">${pet.type} ${pet.breed ? `• ${pet.breed}` : ''}</p>
-                        ${age ? `<p class="text-lg opacity-80">${age}</p>` : ''}
-                    </div>
-                    
-                    <!-- Emergency Contact -->
-                    <div class="p-6 bg-red-50 border-l-4 border-red-500">
-                        <h3 class="text-xl font-bold text-red-800 mb-4">🚨 Acil Durum - Sahibini Ara</h3>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <button onclick="callOwner('${pet.ownerPhone}')" class="emergency-button text-white px-6 py-4 rounded-lg font-bold text-lg">
-                                📞 ${pet.ownerPhone || 'Telefon Yok'}
-                            </button>
-                            <button onclick="sendLocation('${petId}')" class="call-button text-white px-6 py-4 rounded-lg font-bold text-lg">
-                                📍 Konumumu Gönder
-                            </button>
-                        </div>
-                        <p class="text-sm text-gray-600 mt-2">Bu hayvanı buldunuz mu? Yukarıdaki butona tıklayarak sahibini arayın!</p>
-                    </div>
-                    
-                    <!-- Pet Info -->
-                    <div class="p-6">
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <!-- Basic Info -->
-                            <div class="space-y-4">
-                                <h3 class="text-xl font-bold text-gray-800 border-b pb-2">📝 Temel Bilgiler</h3>
-                                ${pet.gender ? `<div><span class="font-semibold">Cinsiyet:</span> ${pet.gender}</div>` : ''}
-                                ${pet.color ? `<div><span class="font-semibold">Renk:</span> ${pet.color}</div>` : ''}
-                                ${pet.weight ? `<div><span class="font-semibold">Ağırlık:</span> ${pet.weight} kg</div>` : ''}
-                                ${pet.microchip ? `<div><span class="font-semibold">Mikroçip:</span> ${pet.microchip}</div>` : ''}
-                                ${pet.neutered ? `<div><span class="font-semibold">Kısırlaştırma:</span> ${pet.neutered}</div>` : ''}
-                                ${pet.childFriendly ? `<div><span class="font-semibold">Çocuklarla:</span> ${pet.childFriendly}</div>` : ''}
-                            </div>
-                            
-                            <!-- Owner Info -->
-                            <div class="space-y-4">
-                                <h3 class="text-xl font-bold text-gray-800 border-b pb-2">👤 Sahip Bilgileri</h3>
-                                <div><span class="font-semibold">Ad:</span> ${pet.ownerName}</div>
-                                <div><span class="font-semibold">E-posta:</span> ${pet.ownerEmail}</div>
-                                ${pet.ownerPhone ? `<div><span class="font-semibold">Telefon:</span> ${pet.ownerPhone}</div>` : ''}
-                            </div>
-                        </div>
-                        
-                        ${pet.description ? `
-                        <div class="mt-6">
-                            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">📖 Açıklama</h3>
-                            <p class="text-gray-700 leading-relaxed">${pet.description}</p>
-                        </div>
-                        ` : ''}
-                        
-                        ${pet.health ? `
-                        <div class="mt-6 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-                            <h3 class="text-xl font-bold text-yellow-800 mb-2">🏥 Sağlık Bilgileri</h3>
-                            <p class="text-gray-700">${pet.health}</p>
-                        </div>
-                        ` : ''}
-                        
-                        ${pet.emergencyInstructions ? `
-                        <div class="mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
-                            <h3 class="text-xl font-bold text-red-800 mb-2">⚠️ Acil Durum Talimatları</h3>
-                            <p class="text-gray-700">${pet.emergencyInstructions}</p>
-                        </div>
-                        ` : ''}
-                        
-                        <!-- Photo Gallery -->
-                        ${pet.photoGallery && pet.photoGallery.length > 0 ? `
-                        <div class="mt-6">
-                            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">📸 Fotoğraf Galerisi</h3>
-                            <div class="image-gallery">
-                                ${pet.photoGallery.map(photo => `
-                                    <img src="${photo}" alt="${pet.name}" class="gallery-item object-cover" onclick="openImageModal('${photo}')" onerror="this.style.display='none'">
-                                `).join('')}
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <!-- Social Media -->
-                        ${(pet.instagram || pet.facebook || pet.tiktok || pet.youtube) ? `
-                        <div class="mt-6">
-                            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">🌐 Sosyal Medya</h3>
-                            <div class="flex gap-4 flex-wrap">
-                                ${pet.instagram ? `<a href="${pet.instagram}" target="_blank" class="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600">📷 Instagram</a>` : ''}
-                                ${pet.facebook ? `<a href="${pet.facebook}" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">📘 Facebook</a>` : ''}
-                                ${pet.tiktok ? `<a href="${pet.tiktok}" target="_blank" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800">🎵 TikTok</a>` : ''}
-                                ${pet.youtube ? `<a href="${pet.youtube}" target="_blank" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">📺 YouTube</a>` : ''}
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <!-- Custom Fields -->
-                        ${pet.customFields && pet.customFields.length > 0 ? `
-                        <div class="mt-6">
-                            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-4">➕ Ek Bilgiler</h3>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                ${pet.customFields.map(field => `
-                                    <div class="bg-gray-50 p-3 rounded-lg">
-                                        <span class="font-semibold">${field.label}:</span> ${field.value}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        ` : ''}
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div class="bg-gray-50 p-6 text-center">
-                        <p class="text-gray-600 mb-4">Bu profil PatiLink NFC sistemi ile oluşturulmuştur</p>
-                        <button onclick="window.location.href = window.location.pathname" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg">
-                            🐾 PatiLink Ana Sayfa
-                        </button>
-                    </div>
+        function generateQRCode(link, petName) {
+            const qrModal = document.createElement('div');
+            qrModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            qrModal.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4 text-center">
+                    <h3 class="text-2xl font-bold mb-6">${petName} - QR Kod</h3>
+                    <div class="qr-code mb-6" id="qrCodeContainer"></div>
+                    <p class="text-gray-600 mb-4">Bu QR kodu taratarak ${petName}'in profiline ulaşabilirsiniz</p>
+                    <button onclick="this.parentElement.parentElement.remove()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg">
+                        Kapat
+                    </button>
                 </div>
             `;
-        }
-
-        function calculateAge(birthDate) {
-            const birth = new Date(birthDate);
-            const today = new Date();
-            const diffTime = Math.abs(today - birth);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            if (diffDays < 30) {
-                return `${diffDays} günlük`;
-            } else if (diffDays < 365) {
-                const months = Math.floor(diffDays / 30);
-                return `${months} aylık`;
-            } else {
-                const years = Math.floor(diffDays / 365);
-                const remainingMonths = Math.floor((diffDays % 365) / 30);
-                return `${years} yaşında ${remainingMonths > 0 ? `${remainingMonths} aylık` : ''}`;
-            }
-        }
-
-        async function callOwner(phone) {
-            if (phone) {
-                // Update call count
-                const urlParams = new URLSearchParams(window.location.search);
-                const petId = urlParams.get('pet');
-                
-                if (petId) {
-                    try {
-                        const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                        if (petDoc.exists()) {
-                            const pet = petDoc.data();
-                            const newStats = pet.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                            newStats.calls = (newStats.calls || 0) + 1;
-                            
-                            await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
-                                stats: newStats
-                            });
-                        }
-                    } catch (error) {
-                        console.error('Error updating call count:', error);
-                    }
-                }
-                
-                window.open(`tel:${phone}`, '_blank');
-            } else {
-                showNotification('Telefon numarası bulunamadı!', 'error');
-            }
-        }
-
-        async function sendLocation(petId) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    try {
-                        const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                        if (petDoc.exists()) {
-                            const pet = petDoc.data();
-                            const newStats = pet.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                            
-                            if (!newStats.locations) newStats.locations = [];
-                            newStats.locations.push({
-                                lat: lat,
-                                lng: lng,
-                                timestamp: new Date().toISOString()
-                            });
-                            
-                            // Keep only last 50 locations
-                            if (newStats.locations.length > 50) {
-                                newStats.locations = newStats.locations.slice(-50);
-                            }
-                            
-                            await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
-                                stats: newStats
-                            });
-                            
-                            showNotification('Konumunuz gönderildi! Sahip bilgilendirilecek.', 'success');
-                        }
-                    } catch (error) {
-                        console.error('Error sending location:', error);
-                        showNotification('Konum gönderilirken hata oluştu!', 'error');
-                    }
-                }, (error) => {
-                    showNotification('Konum alınamadı! Lütfen konum izni verin.', 'error');
-                });
-            } else {
-                showNotification('Tarayıcınız konum özelliğini desteklemiyor!', 'error');
-            }
-        }
-
-        async function trackVisitor(petId) {
-            try {
-                console.log('Tracking visitor for pet:', petId);
-                const response = await fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=b647e2a9739c445984120017ef0a3884`);
-                const locationData = await response.json();
-                
-                console.log('IP Geolocation data:', locationData);
-                
-                const visitor = {
-                    ip: locationData.ip || 'Unknown',
-                    country: locationData.country_name || 'Unknown',
-                    countryCode: locationData.country_code2 || 'XX',
-                    region: locationData.state_prov || 'Unknown',
-                    city: locationData.city || 'Unknown',
-                    latitude: locationData.latitude || null,
-                    longitude: locationData.longitude || null,
-                    timezone: locationData.time_zone?.name || 'Unknown',
-                    isp: locationData.isp || 'Unknown',
-                    organization: locationData.organization || 'Unknown',
-                    asn: locationData.asn || 'Unknown',
-                    continent: locationData.continent_name || 'Unknown',
-                    district: locationData.district || 'Unknown',
-                    zipcode: locationData.zipcode || 'Unknown',
-                    callingCode: locationData.calling_code || 'Unknown',
-                    currency: locationData.currency?.name || 'Unknown',
-                    languages: locationData.languages || 'Unknown',
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    referrer: document.referrer || 'Direct',
-                    screenResolution: `${screen.width}x${screen.height}`,
-                    language: navigator.language || 'Unknown',
-                    platform: navigator.platform || 'Unknown'
-                };
-                
-                console.log('Visitor data prepared:', visitor);
-                
-                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                if (petDoc.exists()) {
-                    const pet = petDoc.data();
-                    const newStats = pet.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                    
-                    if (!newStats.visitors) newStats.visitors = [];
-                    newStats.visitors.push(visitor);
-                    
-                    // Keep only last 100 visitors for better analytics
-                    if (newStats.visitors.length > 100) {
-                        newStats.visitors = newStats.visitors.slice(-100);
-                    }
-                    
-                    await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
-                        stats: newStats
-                    });
-                    
-                    console.log('Visitor data saved successfully');
-                    
-                    // Show visitor info in console for debugging
-                    console.log(`New visitor from ${visitor.city}, ${visitor.country} (${visitor.ip})`);
-                } else {
-                    console.log('Pet document not found');
-                }
-            } catch (error) {
-                console.error('Visitor tracking failed:', error);
-                // Fallback visitor tracking without geolocation
-                try {
-                    const fallbackVisitor = {
-                        ip: 'Unknown',
-                        country: 'Unknown',
-                        city: 'Unknown',
-                        timestamp: new Date().toISOString(),
-                        userAgent: navigator.userAgent,
-                        referrer: document.referrer || 'Direct',
-                        language: navigator.language || 'Unknown',
-                        platform: navigator.platform || 'Unknown',
-                        error: 'Geolocation API failed'
-                    };
-                    
-                    const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                    if (petDoc.exists()) {
-                        const pet = petDoc.data();
-                        const newStats = pet.stats || { views: 0, calls: 0, locations: [], visitors: [] };
-                        
-                        if (!newStats.visitors) newStats.visitors = [];
-                        newStats.visitors.push(fallbackVisitor);
-                        
-                        if (newStats.visitors.length > 100) {
-                            newStats.visitors = newStats.visitors.slice(-100);
-                        }
-                        
-                        await window.firestoreUpdateDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId), {
-                            stats: newStats
-                        });
-                        
-                        console.log('Fallback visitor tracking saved');
-                    }
-                } catch (fallbackError) {
-                    console.error('Fallback visitor tracking also failed:', fallbackError);
-                }
-            }
-        }
-
-        async function exportUserData() {
-            if (!currentUser) {
-                showNotification('Önce giriş yapmalısınız!', 'error');
-                return;
-            }
+            document.body.appendChild(qrModal);
             
-            try {
-                const exportData = {
-                    user: currentUser,
-                    pets: pets,
-                    exportDate: new Date().toISOString(),
-                    version: '2.0-firebase'
-                };
-                
-                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `patilink_${currentUser.email.replace('@', '_')}_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showNotification('Verileriniz başarıyla indirildi!', 'success');
-            } catch (error) {
-                console.error('Export error:', error);
-                showNotification('Veri dışa aktarılırken hata oluştu!', 'error');
-            }
+            // Generate QR code using a simple method
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const qrSize = 200;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(link)}`;
+            qrContainer.innerHTML = `<img src="${qrUrl}" alt="QR Code" class="mx-auto">`;
         }
 
-        function showAdminLogin() {
-            const password = prompt('Admin şifresi:');
-            if (password === 'irem1234') {
-                showNotification('Admin paneli Firebase versiyonunda henüz mevcut değil!', 'info');
-                window.location.href = window.location.pathname;
-            } else if (password !== null) {
-                showNotification('Yanlış şifre!', 'error');
-                window.location.href = window.location.pathname;
-            } else {
-                window.location.href = window.location.pathname;
-            }
+        function showAllLocations(petId) {
+            const pet = pets.find(p => p.id === petId);
+            if (!pet) return;
+            
+            const stats = petStats[petId] || { locations: [] };
+            const locations = stats.locations || [];
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-8 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold">📍 ${pet.name} - Tüm Konum Bildirimleri</h3>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        ${locations.slice().reverse().map((location, index) => `
+                            <div class="bg-gray-50 rounded-lg p-4 border">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">
+                                                #${locations.length - index}
+                                            </span>
+                                            <span class="text-sm font-medium text-gray-800">
+                                                ${new Date(location.timestamp).toLocaleString('tr-TR')}
+                                            </span>
+                                        </div>
+                                        <p class="text-gray-700 mb-1">${location.address || 'Adres bilgisi yok'}</p>
+                                        <p class="text-xs text-gray-500">
+                                            Koordinatlar: ${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}
+                                            ${location.accuracy ? ` • Doğruluk: ±${Math.round(location.accuracy)}m` : ''}
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <button onclick="openInMaps(${location.latitude}, ${location.longitude})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                            🗺️ Harita
+                                        </button>
+                                        <button onclick="copyLocation(${location.latitude}, ${location.longitude})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">
+                                            📋 Kopyala
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${locations.length === 0 ? `
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">📍</div>
+                        <h4 class="text-xl font-semibold text-gray-600 mb-2">Henüz konum bildirimi yok</h4>
+                        <p class="text-gray-500">Hayvanınızı bulan kişiler konum gönderdiğinde burada görünecek.</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function copyLocation(lat, lng) {
+            const locationText = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            navigator.clipboard.writeText(locationText).then(() => {
+                showNotification('Konum koordinatları kopyalandı!', 'success');
+            }).catch(() => {
+                showNotification('Konum kopyalanamadı!', 'error');
+            });
         }
 
         function showNotification(message, type = 'info') {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
-            notification.className = `notification p-4 rounded-lg shadow-lg text-white max-w-sm ${
-                type === 'success' ? 'bg-green-500' : 
-                type === 'error' ? 'bg-red-500' : 
-                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-            }`;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.className = `notification ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg max-w-sm`;
             notification.textContent = message;
             
             container.appendChild(notification);
@@ -1706,191 +1751,6 @@
                 notification.remove();
             }, 5000);
         }
-
-        async function showLocations(petId) {
-            try {
-                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                if (!petDoc.exists()) {
-                    showNotification('Hayvan profili bulunamadı!', 'error');
-                    return;
-                }
-                
-                const pet = petDoc.data();
-                const locations = pet.stats?.locations || [];
-                
-                const locationsContent = document.getElementById('locationsContent');
-                
-                if (locations.length === 0) {
-                    locationsContent.innerHTML = `
-                        <div class="text-center py-12">
-                            <div class="text-6xl mb-4">📍</div>
-                            <h3 class="text-xl font-semibold text-gray-600 mb-2">Henüz konum gönderilmedi</h3>
-                            <p class="text-gray-500">Hayvanınızı bulan kişiler konum gönderdiğinde burada görünecek.</p>
-                        </div>
-                    `;
-                } else {
-                    locationsContent.innerHTML = `
-                        <div class="mb-6">
-                            <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                                <h4 class="font-semibold text-blue-800 mb-2">📊 Konum İstatistikleri</h4>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                                    <div>
-                                        <span class="font-medium">Toplam Konum:</span> ${locations.length}
-                                    </div>
-                                    <div>
-                                        <span class="font-medium">İlk Konum:</span> ${new Date(locations[0].timestamp).toLocaleDateString('tr-TR')}
-                                    </div>
-                                    <div>
-                                        <span class="font-medium">Son Konum:</span> ${new Date(locations[locations.length - 1].timestamp).toLocaleDateString('tr-TR')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-4 max-h-96 overflow-y-auto">
-                            ${locations.slice().reverse().map((location, index) => `
-                                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-                                                #${locations.length - index}
-                                            </span>
-                                            <span class="text-sm text-gray-600">
-                                                ${new Date(location.timestamp).toLocaleString('tr-TR')}
-                                            </span>
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <button onclick="openInMaps(${location.lat}, ${location.lng})" 
-                                                    class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs">
-                                                🗺️ Haritada Aç
-                                            </button>
-                                            <button onclick="copyCoordinates(${location.lat}, ${location.lng})" 
-                                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-                                                📋 Kopyala
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <span class="font-medium text-gray-700">Enlem:</span>
-                                            <span class="text-gray-600">${location.lat.toFixed(6)}</span>
-                                        </div>
-                                        <div>
-                                            <span class="font-medium text-gray-700">Boylam:</span>
-                                            <span class="text-gray-600">${location.lng.toFixed(6)}</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mt-3 pt-3 border-t border-gray-100">
-                                        <div class="flex flex-wrap gap-2">
-                                            <a href="https://www.google.com/maps?q=${location.lat},${location.lng}" 
-                                               target="_blank" 
-                                               class="text-blue-600 hover:text-blue-800 text-xs underline">
-                                                Google Maps
-                                            </a>
-                                            <a href="https://maps.apple.com/?q=${location.lat},${location.lng}" 
-                                               target="_blank" 
-                                               class="text-blue-600 hover:text-blue-800 text-xs underline">
-                                                Apple Maps
-                                            </a>
-                                            <a href="https://www.openstreetmap.org/?mlat=${location.lat}&mlon=${location.lng}&zoom=15" 
-                                               target="_blank" 
-                                               class="text-blue-600 hover:text-blue-800 text-xs underline">
-                                                OpenStreetMap
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <div class="mt-6 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-                            <h4 class="font-semibold text-yellow-800 mb-2">💡 İpucu</h4>
-                            <p class="text-sm text-yellow-700">
-                                Konumları haritada görüntülemek için "Haritada Aç" butonunu kullanın. 
-                                Koordinatları kopyalayarak başka uygulamalarda da kullanabilirsiniz.
-                            </p>
-                        </div>
-                    `;
-                }
-                
-                showModal('locationsModal');
-                
-            } catch (error) {
-                console.error('Error loading locations:', error);
-                showNotification('Konumlar yüklenirken hata oluştu!', 'error');
-            }
-        }
-
-        function openInMaps(lat, lng) {
-            // Try to open in the most appropriate maps app
-            const userAgent = navigator.userAgent;
-            
-            if (/iPad|iPhone|iPod/.test(userAgent)) {
-                // iOS device - try Apple Maps first
-                window.open(`maps://maps.apple.com/?q=${lat},${lng}`, '_blank');
-            } else if (/Android/.test(userAgent)) {
-                // Android device - try Google Maps app
-                window.open(`geo:${lat},${lng}`, '_blank');
-            } else {
-                // Desktop or other - open Google Maps in browser
-                window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-            }
-        }
-
-        function copyCoordinates(lat, lng) {
-            const coordinates = `${lat}, ${lng}`;
-            navigator.clipboard.writeText(coordinates).then(() => {
-                showNotification('Koordinatlar kopyalandı!', 'success');
-            }).catch(() => {
-                showNotification('Koordinatlar kopyalanamadı!', 'error');
-            });
-        }
-
-        async function openLastLocation(petId) {
-            try {
-                const petDoc = await window.firestoreGetDoc(window.firestoreDoc(window.firebaseDb, 'pets', petId));
-                if (!petDoc.exists()) {
-                    showNotification('Hayvan profili bulunamadı!', 'error');
-                    return;
-                }
-                
-                const pet = petDoc.data();
-                const locations = pet.stats?.locations || [];
-                
-                if (locations.length === 0) {
-                    showNotification('Henüz konum bilgisi yok!', 'warning');
-                    return;
-                }
-                
-                const lastLocation = locations[locations.length - 1];
-                openInMaps(lastLocation.lat, lastLocation.lng);
-                
-                showNotification('Son konum haritada açılıyor...', 'success');
-                
-            } catch (error) {
-                console.error('Error opening last location:', error);
-                showNotification('Son konum açılırken hata oluştu!', 'error');
-            }
-        }
-
-        // Global functions for onclick handlers
-        window.showModal = showModal;
-        window.hideModal = hideModal;
-        window.exportUserData = exportUserData;
-        window.deletePet = deletePet;
-        window.copyLink = copyLink;
-        window.switchTab = switchTab;
-        window.addPhoto = addPhoto;
-        window.removePhoto = removePhoto;
-        window.callOwner = callOwner;
-        window.sendLocation = sendLocation;
-        window.showLocations = showLocations;
-        window.openInMaps = openInMaps;
-        window.copyCoordinates = copyCoordinates;
-        window.openLastLocation = openLastLocation;
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ee95c086abe00b',t:'MTc2MDUyMzYzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f00ceb0432e00b',t:'MTc2MDUzOTAwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
