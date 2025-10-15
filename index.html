@@ -184,6 +184,16 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        .map-options {
+            animation: slideDown 0.2s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .map-options button:hover {
+            background-color: #f3f4f6;
+        }
     </style>
 </head>
 <body class="min-h-full bg-gray-50">
@@ -579,6 +589,20 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Custom Fields Section -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-semibold text-gray-800">📝 Ek Bilgi Kutucukları</h4>
+                            <button type="button" onclick="addCustomField()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                + Yeni Kutucuk Ekle
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Özel bilgiler için ek kutucuklar ekleyebilirsiniz (örn: Favori oyuncağı, Korktuğu şeyler, Özel notlar)</p>
+                        <div id="customFieldsContainer" class="space-y-4">
+                            <!-- Custom fields will be added here -->
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="flex gap-4 mt-8">
@@ -640,6 +664,7 @@
         let petStats = {};
         let currentTab = 'basic';
         let uploadedPhotos = [];
+        let customFields = [];
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
@@ -928,6 +953,7 @@
                 facebook: formData.get('facebook') || '',
                 twitter: formData.get('twitter') || '',
                 website: formData.get('website') || '',
+                customFields: customFields.filter(field => field.title.trim() && field.content.trim()),
                 photos: uploadedPhotos,
                 ownerId: currentUser.uid,
                 ownerName: currentUser.name,
@@ -948,7 +974,9 @@
                 
                 e.target.reset();
                 uploadedPhotos = [];
+                customFields = [];
                 document.getElementById('photoPreview').innerHTML = '';
+                document.getElementById('customFieldsContainer').innerHTML = '';
                 await loadUserPets();
                 
             } catch (error) {
@@ -1033,6 +1061,81 @@
         function removePhoto(photoId) {
             uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
             renderPhotoPreview();
+        }
+
+        function addCustomField() {
+            const fieldId = Date.now() + Math.random();
+            const customField = {
+                id: fieldId,
+                title: '',
+                content: '',
+                icon: '📝'
+            };
+            
+            customFields.push(customField);
+            renderCustomFields();
+        }
+
+        function removeCustomField(fieldId) {
+            customFields = customFields.filter(field => field.id !== fieldId);
+            renderCustomFields();
+        }
+
+        function renderCustomFields() {
+            const container = document.getElementById('customFieldsContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            customFields.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4';
+                fieldDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <select onchange="updateCustomFieldIcon('${field.id}', this.value)" class="text-lg bg-transparent border-none outline-none cursor-pointer">
+                                <option value="📝" ${field.icon === '📝' ? 'selected' : ''}>📝</option>
+                                <option value="🎾" ${field.icon === '🎾' ? 'selected' : ''}>🎾</option>
+                                <option value="❤️" ${field.icon === '❤️' ? 'selected' : ''}>❤️</option>
+                                <option value="😨" ${field.icon === '😨' ? 'selected' : ''}>😨</option>
+                                <option value="🍖" ${field.icon === '🍖' ? 'selected' : ''}>🍖</option>
+                                <option value="🏠" ${field.icon === '🏠' ? 'selected' : ''}>🏠</option>
+                                <option value="⭐" ${field.icon === '⭐' ? 'selected' : ''}>⭐</option>
+                                <option value="🎵" ${field.icon === '🎵' ? 'selected' : ''}>🎵</option>
+                                <option value="🌟" ${field.icon === '🌟' ? 'selected' : ''}>🌟</option>
+                                <option value="💊" ${field.icon === '💊' ? 'selected' : ''}>💊</option>
+                                <option value="🎯" ${field.icon === '🎯' ? 'selected' : ''}>🎯</option>
+                                <option value="📍" ${field.icon === '📍' ? 'selected' : ''}>📍</option>
+                            </select>
+                            <input type="text" placeholder="Kutucuk başlığı (örn: Favori Oyuncağı)" value="${field.title}" onchange="updateCustomFieldTitle('${field.id}', this.value)" class="font-medium text-gray-800 bg-transparent border-none outline-none flex-1 placeholder-gray-400">
+                        </div>
+                        <button type="button" onclick="removeCustomField('${field.id}')" class="text-red-500 hover:text-red-700 text-lg">×</button>
+                    </div>
+                    <textarea placeholder="İçerik yazın..." onchange="updateCustomFieldContent('${field.id}', this.value)" class="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 resize-none" rows="3">${field.content}</textarea>
+                `;
+                container.appendChild(fieldDiv);
+            });
+        }
+
+        function updateCustomFieldIcon(fieldId, icon) {
+            const field = customFields.find(f => f.id == fieldId);
+            if (field) {
+                field.icon = icon;
+            }
+        }
+
+        function updateCustomFieldTitle(fieldId, title) {
+            const field = customFields.find(f => f.id == fieldId);
+            if (field) {
+                field.title = title;
+            }
+        }
+
+        function updateCustomFieldContent(fieldId, content) {
+            const field = customFields.find(f => f.id == fieldId);
+            if (field) {
+                field.content = content;
+            }
         }
 
         async function logout() {
@@ -1274,9 +1377,28 @@
                                             ${location.accuracy ? ` • Doğruluk: ±${Math.round(location.accuracy)}m` : ''}
                                         </p>
                                     </div>
-                                    <button onclick="openInMaps(${location.latitude}, ${location.longitude})" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
-                                        🗺️ Harita
-                                    </button>
+                                    <div class="ml-2 relative">
+                                        <button onclick="toggleMapOptions(this)" class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs">
+                                            🗺️ Harita ▼
+                                        </button>
+                                        <div class="map-options hidden absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                                            <button onclick="openInGoogleMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                                🌍 Google Maps
+                                            </button>
+                                            <button onclick="openInAppleMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                🍎 Apple Maps
+                                            </button>
+                                            <button onclick="openInOpenStreetMap(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                🗺️ OpenStreetMap
+                                            </button>
+                                            <button onclick="openInYandexMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                🔍 Yandex Maps
+                                            </button>
+                                            <button onclick="openInBingMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                                                🔷 Bing Maps
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
@@ -1380,6 +1502,83 @@
             }
         }
 
+        async function getAddressFromCoordinates(lat, lng) {
+            const apis = [
+                // API 1: LocationIQ (Free tier: 5000 requests/day)
+                {
+                    url: `https://us1.locationiq.com/v1/reverse.php?key=pk.0123456789abcdef&lat=${lat}&lon=${lng}&format=json&accept-language=tr`,
+                    parser: (data) => data.display_name
+                },
+                // API 2: Nominatim with different user agent
+                {
+                    url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=tr&addressdetails=1`,
+                    parser: (data) => data.display_name,
+                    headers: {
+                        'User-Agent': 'PatiLink/1.0 (https://patilink.com)'
+                    }
+                },
+                // API 3: MapBox (requires token but has free tier)
+                {
+                    url: `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=pk.eyJ1IjoicGF0aWxpbmsiLCJhIjoiY2x0ZXN0MTIzIn0.example&language=tr`,
+                    parser: (data) => data.features && data.features[0] ? data.features[0].place_name : null
+                },
+                // API 4: BigDataCloud (Free tier)
+                {
+                    url: `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=tr`,
+                    parser: (data) => {
+                        if (data.locality && data.countryName) {
+                            return `${data.locality}, ${data.principalSubdivision || ''}, ${data.countryName}`.replace(', ,', ',');
+                        }
+                        return null;
+                    }
+                },
+                // API 5: OpenCage (Free tier: 2500 requests/day)
+                {
+                    url: `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=demo-key&language=tr&pretty=1`,
+                    parser: (data) => data.results && data.results[0] ? data.results[0].formatted : null
+                }
+            ];
+
+            for (let i = 0; i < apis.length; i++) {
+                try {
+                    const api = apis[i];
+                    const options = {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            ...api.headers
+                        }
+                    };
+
+                    const response = await fetch(api.url, options);
+                    
+                    if (!response.ok) {
+                        console.log(`API ${i + 1} failed with status:`, response.status);
+                        continue;
+                    }
+
+                    const data = await response.json();
+                    const address = api.parser(data);
+                    
+                    if (address && address.trim()) {
+                        console.log(`Address found using API ${i + 1}:`, address);
+                        return address;
+                    }
+                } catch (error) {
+                    console.log(`API ${i + 1} error:`, error.message);
+                    continue;
+                }
+                
+                // Add delay between API calls to avoid rate limiting
+                if (i < apis.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+
+            // If all APIs fail, return coordinates
+            return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+
         function renderPetProfile(pet) {
             const petProfileContent = document.getElementById('petProfileContent');
             
@@ -1480,6 +1679,21 @@
                         </div>
                         ` : ''}
 
+                        <!-- Custom Fields -->
+                        ${pet.customFields && pet.customFields.length > 0 ? `
+                        <div class="grid md:grid-cols-2 gap-4 mb-6">
+                            ${pet.customFields.map(field => `
+                                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+                                        <span class="text-xl">${field.icon}</span>
+                                        ${field.title}
+                                    </h3>
+                                    <p class="text-indigo-700 leading-relaxed">${field.content}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ` : ''}
+
                         <!-- Social Media Links -->
                         ${(pet.instagram || pet.tiktok || pet.youtube || pet.facebook || pet.twitter || pet.website) ? `
                         <div class="bg-gradient-to-r from-pink-50 to-purple-50 border border-purple-200 rounded-lg p-6">
@@ -1518,15 +1732,9 @@
                             address: 'Adres alınıyor...'
                         };
                         
-                        // Get address from coordinates using Nominatim (OpenStreetMap)
+                        // Get address from coordinates using multiple fallback APIs
                         try {
-                            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${locationData.latitude}&lon=${locationData.longitude}&accept-language=tr&addressdetails=1`);
-                            const data = await response.json();
-                            if (data && data.display_name) {
-                                locationData.address = data.display_name;
-                            } else {
-                                locationData.address = `${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`;
-                            }
+                            locationData.address = await getAddressFromCoordinates(locationData.latitude, locationData.longitude);
                         } catch (addressError) {
                             console.log('Address lookup failed:', addressError);
                             locationData.address = `${locationData.latitude.toFixed(6)}, ${locationData.longitude.toFixed(6)}`;
@@ -1601,9 +1809,28 @@
                     </div>
                     
                     <div class="flex gap-3">
-                        <button onclick="openInMaps(${locationData.latitude}, ${locationData.longitude})" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm">
-                            🗺️ Haritada Göster
-                        </button>
+                        <div class="flex-1 relative">
+                            <button onclick="toggleMapOptions(this)" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm">
+                                🗺️ Haritada Göster ▼
+                            </button>
+                            <div class="map-options hidden absolute left-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 w-full">
+                                <button onclick="openInGoogleMaps(${locationData.latitude}, ${locationData.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                    🌍 Google Maps
+                                </button>
+                                <button onclick="openInAppleMaps(${locationData.latitude}, ${locationData.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    🍎 Apple Maps
+                                </button>
+                                <button onclick="openInOpenStreetMap(${locationData.latitude}, ${locationData.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    🗺️ OpenStreetMap
+                                </button>
+                                <button onclick="openInYandexMaps(${locationData.latitude}, ${locationData.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    🔍 Yandex Maps
+                                </button>
+                                <button onclick="openInBingMaps(${locationData.latitude}, ${locationData.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                                    🔷 Bing Maps
+                                </button>
+                            </div>
+                        </div>
                         <button onclick="this.closest('.fixed').remove()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg text-sm">
                             Kapat
                         </button>
@@ -1621,34 +1848,89 @@
             }, 10000);
         }
 
-        function openInMaps(lat, lng) {
+        function toggleMapOptions(button) {
+            const mapOptions = button.nextElementSibling;
+            const allMapOptions = document.querySelectorAll('.map-options');
+            
+            // Close all other map options
+            allMapOptions.forEach(option => {
+                if (option !== mapOptions) {
+                    option.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current map options
+            mapOptions.classList.toggle('hidden');
+            
+            // Close when clicking outside
+            if (!mapOptions.classList.contains('hidden')) {
+                setTimeout(() => {
+                    document.addEventListener('click', function closeMapOptions(e) {
+                        if (!button.contains(e.target) && !mapOptions.contains(e.target)) {
+                            mapOptions.classList.add('hidden');
+                            document.removeEventListener('click', closeMapOptions);
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        function openInGoogleMaps(lat, lng) {
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             
             if (isMobile) {
-                // For mobile devices, try multiple options
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-                const isAndroid = /Android/.test(navigator.userAgent);
-                
-                if (isIOS) {
-                    // iOS - try Apple Maps first, then Google Maps
-                    window.open(`maps://maps.apple.com/?q=${lat},${lng}`, '_blank');
-                    setTimeout(() => {
-                        window.open(`https://maps.apple.com/?q=${lat},${lng}`, '_blank');
-                    }, 1000);
-                } else if (isAndroid) {
-                    // Android - try geo protocol first
-                    window.open(`geo:${lat},${lng}?q=${lat},${lng}`, '_blank');
-                    setTimeout(() => {
-                        window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
-                    }, 1000);
-                } else {
-                    // Other mobile browsers
-                    window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
-                }
+                // Mobile - try app first, then web
+                window.open(`comgooglemaps://?q=${lat},${lng}&center=${lat},${lng}&zoom=16`, '_blank');
+                setTimeout(() => {
+                    window.open(`https://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=16`, '_blank');
+                }, 1000);
             } else {
-                // Desktop - use OpenStreetMap as primary option
-                window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16`, '_blank');
+                // Desktop
+                window.open(`https://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=16`, '_blank');
             }
+        }
+
+        function openInAppleMaps(lat, lng) {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            
+            if (isIOS) {
+                // iOS - try app first
+                window.open(`maps://maps.apple.com/?q=${lat},${lng}&ll=${lat},${lng}&z=16`, '_blank');
+                setTimeout(() => {
+                    window.open(`https://maps.apple.com/?q=${lat},${lng}`, '_blank');
+                }, 1000);
+            } else {
+                // Non-iOS devices
+                window.open(`https://maps.apple.com/?q=${lat},${lng}`, '_blank');
+            }
+        }
+
+        function openInOpenStreetMap(lat, lng) {
+            window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=16#map=16/${lat}/${lng}`, '_blank');
+        }
+
+        function openInYandexMaps(lat, lng) {
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Mobile - try app first
+                window.open(`yandexmaps://maps.yandex.com/?pt=${lng},${lat}&z=16&l=map`, '_blank');
+                setTimeout(() => {
+                    window.open(`https://yandex.com.tr/harita/?pt=${lng},${lat}&z=16&l=map`, '_blank');
+                }, 1000);
+            } else {
+                // Desktop
+                window.open(`https://yandex.com.tr/harita/?pt=${lng},${lat}&z=16&l=map`, '_blank');
+            }
+        }
+
+        function openInBingMaps(lat, lng) {
+            window.open(`https://www.bing.com/maps?cp=${lat}~${lng}&lvl=16&style=r`, '_blank');
+        }
+
+        // Legacy function for backward compatibility
+        function openInMaps(lat, lng) {
+            openInGoogleMaps(lat, lng);
         }
 
         function copyLink(link) {
@@ -1718,9 +2000,28 @@
                                         </p>
                                     </div>
                                     <div class="flex gap-2 ml-4">
-                                        <button onclick="openInMaps(${location.latitude}, ${location.longitude})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
-                                            🗺️ Harita
-                                        </button>
+                                        <div class="relative">
+                                            <button onclick="toggleMapOptions(this)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                                🗺️ Harita ▼
+                                            </button>
+                                            <div class="map-options hidden absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                                                <button onclick="openInGoogleMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
+                                                    🌍 Google Maps
+                                                </button>
+                                                <button onclick="openInAppleMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    🍎 Apple Maps
+                                                </button>
+                                                <button onclick="openInOpenStreetMap(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    🗺️ OpenStreetMap
+                                                </button>
+                                                <button onclick="openInYandexMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                    🔍 Yandex Maps
+                                                </button>
+                                                <button onclick="openInBingMaps(${location.latitude}, ${location.longitude})" class="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
+                                                    🔷 Bing Maps
+                                                </button>
+                                            </div>
+                                        </div>
                                         <button onclick="copyLocation(${location.latitude}, ${location.longitude})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm">
                                             📋 Kopyala
                                         </button>
@@ -1768,5 +2069,5 @@
             }, 5000);
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f01ad74398e00b',t:'MTc2MDUzOTU3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f024d2f532e00b',t:'MTc2MDUzOTk4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
